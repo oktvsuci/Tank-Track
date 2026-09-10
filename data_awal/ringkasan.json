@@ -1,0 +1,21 @@
+{
+  "kode_kendaraan": "K-04",
+  "kendaraan": "Truk tangki",
+  "trayek": "Serang – Cilegon",
+  "jenis_bbm": "Biosolar",
+  "harga_per_liter": 6800,
+  "efisiensi_acuan": 3.2,
+  "jumlah_hari": 1,
+  "jumlah_trip": 3,
+  "total_km": 85.8,
+  "total_liter": 32.5,
+  "total_biaya": 221087,
+  "liter_idle": 0.0,
+  "liter_boros": 5.7,
+  "biaya_boros": 38763,
+  "catatan": "Data simulasi, bukan rekaman kendaraan sungguhan.",
+  "malam_trip": 1,
+  "malam_km_per_liter": 3.09,
+  "siang_trip": 2,
+  "siang_km_per_liter": 2.46
+}

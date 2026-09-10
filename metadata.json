@@ -1,0 +1,6 @@
+{
+  "name": "TankTrack GIS - Fleet Fuel Efficiency System",
+  "description": "Sistem WebGIS Fleet Management untuk tracking mobil tangki dan analisis efisiensi BBM multi-armada 7 hari.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

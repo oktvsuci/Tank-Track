@@ -1,0 +1,74 @@
+{
+  "metadata": {
+    "sistem": "TankTrack WebGIS Fleet Management",
+    "periode": "03-09 Maret 2025 (7 Hari Penuh)",
+    "total_armada": 3,
+    "armada_list": [
+      "K-04",
+      "K-07",
+      "K-12"
+    ],
+    "jenis_bbm": "Biosolar",
+    "harga_per_liter": 6800,
+    "efisiensi_acuan_standar": 3.2,
+    "total_hari": 7,
+    "total_trip": 63
+  },
+  "agregat_total": {
+    "total_km": 1650.64,
+    "total_liter": 593.55,
+    "total_biaya_rp": 4036140,
+    "total_liter_idle": 4.54,
+    "total_liter_boros": 77.75,
+    "total_biaya_boros_rp": 528700,
+    "rata_rata_km_per_liter": 2.78,
+    "malam_trip_count": 21,
+    "malam_rata_km_per_liter": 3.15,
+    "siang_trip_count": 42,
+    "siang_rata_km_per_liter": 2.67
+  },
+  "per_armada": {
+    "K-04": {
+      "kode_kendaraan": "K-04",
+      "kendaraan": "Truk tangki 30KL",
+      "trayek": "Serang \u2013 Cilegon",
+      "jumlah_trip": 21,
+      "total_km": 601.8,
+      "total_liter": 216.58,
+      "total_biaya_rp": 1472744,
+      "total_liter_boros": 28.51,
+      "total_biaya_boros_rp": 193868,
+      "rata_rata_km_per_liter": 2.78,
+      "malam_km_per_liter": 3.14,
+      "siang_km_per_liter": 2.66
+    },
+    "K-07": {
+      "kode_kendaraan": "K-07",
+      "kendaraan": "Truk tangki 16KL",
+      "trayek": "Serang \u2013 Anyer",
+      "jumlah_trip": 21,
+      "total_km": 812.85,
+      "total_liter": 291.62,
+      "total_biaya_rp": 1983016,
+      "total_liter_boros": 37.61,
+      "total_biaya_boros_rp": 255748,
+      "rata_rata_km_per_liter": 2.79,
+      "malam_km_per_liter": 3.16,
+      "siang_km_per_liter": 2.66
+    },
+    "K-12": {
+      "kode_kendaraan": "K-12",
+      "kendaraan": "Truk tangki 24KL",
+      "trayek": "Cilegon \u2013 Merak",
+      "jumlah_trip": 21,
+      "total_km": 235.99,
+      "total_liter": 85.35,
+      "total_biaya_rp": 580380,
+      "total_liter_boros": 11.63,
+      "total_biaya_boros_rp": 79084,
+      "rata_rata_km_per_liter": 2.76,
+      "malam_km_per_liter": 3.16,
+      "siang_km_per_liter": 2.68
+    }
+  }
+}
