@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { X, Plus, MapPin, Truck, Calendar, Clock, Gauge, Compass } from 'lucide-react';
+import { X, Plus, MapPin, Truck, Calendar, Clock, Gauge } from 'lucide-react';
 import { RouteFeature, PointFeature } from '../src/types';
 
 interface AddRouteModalProps {
@@ -45,8 +45,9 @@ export const AddRouteModal: React.FC<AddRouteModalProps> = ({
     const literIdle = kmPerLiter < 2.7 ? 0.35 : 0.05;
     const literTotal = Math.round((literJalan + literIdle) * 100) / 100;
     const biayaRp = Math.round(literTotal * 6800);
-    const literStandar = Math.round((jarakKm / 3.20) * 100) / 100;
-    const literBoros = Math.round(Math.max(0, literTotal - literStandar) * 100) / 100;
+
+    const literIdeal = Math.round((jarakKm / 3.20) * 100) / 100;
+    const literBoros = Math.max(0, Math.round((literTotal - literIdeal) * 100) / 100);
     const biayaBorosRp = Math.round(literBoros * 6800);
 
     // Calculate end time
@@ -56,9 +57,9 @@ export const AddRouteModal: React.FC<AddRouteModalProps> = ({
     const endM = totalMinutes % 60;
     const jamSelesai = `${String(endH).padStart(2, '0')}:${String(endM).padStart(2, '0')}`;
 
-    // Create intermediate path coordinates between start and end with curvature
-    const midLat = (latAwal + latAkhir) / 2 + (Math.random() - 0.5) * 0.02;
-    const midLng = (lngAwal + lngAkhir) / 2 + (Math.random() - 0.5) * 0.02;
+    // Create intermediate path coordinates between start and end
+    const midLat = (latAwal + latAkhir) / 2;
+    const midLng = (lngAwal + lngAkhir) / 2;
 
     const coordinates: [number, number][] = [
       [lngAwal, latAwal],
@@ -72,7 +73,7 @@ export const AddRouteModal: React.FC<AddRouteModalProps> = ({
       type: 'Feature',
       properties: {
         trip_id: tripId,
-        nama: `Trip Baru (Simulasi ${kodeKendaraan})`,
+        nama: `Trip Tambahan (${kodeKendaraan})`,
         kendaraan: kodeKendaraan === 'K-04' ? 'Truk tangki 30KL' : kodeKendaraan === 'K-07' ? 'Truk tangki 16KL' : 'Truk tangki 24KL',
         kode_kendaraan: kodeKendaraan,
         trayek,
@@ -165,26 +166,21 @@ export const AddRouteModal: React.FC<AddRouteModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-fadeIn">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-2xs animate-fadeIn">
       <div
         id="add-route-modal-card"
-        className="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto shadow-2xl text-slate-100"
+        className="bg-white border border-slate-200 rounded-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto shadow-xl text-slate-800"
       >
         {/* Modal Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800 sticky top-0 bg-slate-900/95 backdrop-blur-md z-10">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
-              <Plus className="w-5 h-5" />
-            </div>
-            <div>
-              <h3 className="font-bold text-base text-white">+ Tambah Rute Baru Dinamis</h3>
-              <p className="text-xs text-slate-400">Input parameter trip untuk simulasi visual instan di peta</p>
-            </div>
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 sticky top-0 bg-white/95 backdrop-blur-xs z-10">
+          <div>
+            <h3 className="font-semibold text-base text-slate-900">Tambah Rute Operasional Baru</h3>
+            <p className="text-xs text-slate-500">Simulasikan rute perjalanan tambahan ke peta WebGIS</p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors"
+            className="text-slate-400 hover:text-slate-700 p-1 rounded-lg hover:bg-slate-100 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -195,8 +191,8 @@ export const AddRouteModal: React.FC<AddRouteModalProps> = ({
           {/* Row 1: Kode Kendaraan & Hari */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1 flex items-center gap-1.5">
-                <Truck className="w-3.5 h-3.5 text-blue-400" />
+              <label className="block text-xs font-medium text-slate-600 mb-1 flex items-center gap-1.5">
+                <Truck className="w-3.5 h-3.5 text-slate-400" />
                 Kode Armada Kendaraan
               </label>
               <select
@@ -208,7 +204,7 @@ export const AddRouteModal: React.FC<AddRouteModalProps> = ({
                   else if (val === 'K-07') setTrayek('Serang – Anyer (Pesisir Wisata)');
                   else setTrayek('Cilegon – Merak (Koridor Pelabuhan)');
                 }}
-                className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-emerald-500"
+                className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900 focus:border-slate-900 text-xs"
               >
                 <option value="K-04">K-04 (Truk Tangki 30KL)</option>
                 <option value="K-07">K-07 (Truk Tangki 16KL)</option>
@@ -218,14 +214,14 @@ export const AddRouteModal: React.FC<AddRouteModalProps> = ({
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1 flex items-center gap-1.5">
-                <Calendar className="w-3.5 h-3.5 text-amber-400" />
+              <label className="block text-xs font-medium text-slate-600 mb-1 flex items-center gap-1.5">
+                <Calendar className="w-3.5 h-3.5 text-slate-400" />
                 Hari Operasional
               </label>
               <select
                 value={hari}
                 onChange={(e) => setHari(e.target.value)}
-                className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-emerald-500"
+                className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900 focus:border-slate-900 text-xs"
               >
                 <option value="Senin">Senin</option>
                 <option value="Selasa">Selasa</option>
@@ -240,12 +236,12 @@ export const AddRouteModal: React.FC<AddRouteModalProps> = ({
 
           {/* Trayek */}
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">Nama Trayek / Rute</label>
+            <label className="block text-xs font-medium text-slate-600 mb-1">Nama Trayek / Koridor</label>
             <input
               type="text"
               value={trayek}
               onChange={(e) => setTrayek(e.target.value)}
-              className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-emerald-500 text-xs"
+              className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900 focus:border-slate-900 text-xs"
               required
             />
           </div>
@@ -253,33 +249,33 @@ export const AddRouteModal: React.FC<AddRouteModalProps> = ({
           {/* Row 2: Jam, Durasi, Jarak */}
           <div className="grid grid-cols-3 gap-2">
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1 flex items-center gap-1">
+              <label className="block text-xs font-medium text-slate-600 mb-1 flex items-center gap-1">
                 <Clock className="w-3 h-3 text-slate-400" /> Jam Mulai
               </label>
               <input
                 type="time"
                 value={jamMulai}
                 onChange={(e) => setJamMulai(e.target.value)}
-                className="w-full bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-2 text-white text-xs"
+                className="w-full bg-white border border-slate-300 rounded-lg px-2.5 py-2 text-slate-900 text-xs focus:outline-none focus:ring-1 focus:ring-slate-900"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">Durasi (Menit)</label>
+              <label className="block text-xs font-medium text-slate-600 mb-1">Durasi (Menit)</label>
               <input
                 type="number"
                 min="10"
                 max="240"
                 value={durasiMenit}
                 onChange={(e) => setDurasiMenit(Number(e.target.value))}
-                className="w-full bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-2 text-white text-xs"
+                className="w-full bg-white border border-slate-300 rounded-lg px-2.5 py-2 text-slate-900 text-xs focus:outline-none focus:ring-1 focus:ring-slate-900"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">Jarak (km)</label>
+              <label className="block text-xs font-medium text-slate-600 mb-1">Jarak (km)</label>
               <input
                 type="number"
                 step="0.1"
@@ -287,7 +283,7 @@ export const AddRouteModal: React.FC<AddRouteModalProps> = ({
                 max="300"
                 value={jarakKm}
                 onChange={(e) => setJarakKm(Number(e.target.value))}
-                className="w-full bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-2 text-white text-xs"
+                className="w-full bg-white border border-slate-300 rounded-lg px-2.5 py-2 text-slate-900 text-xs focus:outline-none focus:ring-1 focus:ring-slate-900"
                 required
               />
             </div>
@@ -295,13 +291,13 @@ export const AddRouteModal: React.FC<AddRouteModalProps> = ({
 
           {/* Efisiensi BBM Input */}
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1 flex items-center justify-between">
+            <label className="block text-xs font-medium text-slate-600 mb-1 flex items-center justify-between">
               <span className="flex items-center gap-1.5">
-                <Gauge className="w-3.5 h-3.5 text-emerald-400" />
+                <Gauge className="w-3.5 h-3.5 text-slate-400" />
                 Estimasi Efisiensi BBM (km / Liter)
               </span>
-              <span className={`font-mono text-xs font-bold ${kmPerLiter >= 2.9 ? 'text-blue-400' : kmPerLiter >= 2.7 ? 'text-emerald-400' : 'text-rose-400'}`}>
-                {kmPerLiter} km/L ({kmPerLiter < 2.7 ? 'Boros/Macet' : 'Efisien'})
+              <span className={`font-mono text-xs font-semibold ${kmPerLiter >= 2.7 ? 'text-emerald-700' : 'text-rose-700'}`}>
+                {kmPerLiter} km/L ({kmPerLiter < 2.7 ? 'Macet / Idling' : 'Efisien'})
               </span>
             </label>
             <input
@@ -311,33 +307,33 @@ export const AddRouteModal: React.FC<AddRouteModalProps> = ({
               step="0.05"
               value={kmPerLiter}
               onChange={(e) => setKmPerLiter(Number(e.target.value))}
-              className="w-full accent-emerald-500 cursor-pointer"
+              className="w-full accent-slate-900 cursor-pointer"
             />
-            <div className="flex justify-between text-[10px] text-slate-500 mt-0.5">
-              <span>2.10 (Macet Parah)</span>
-              <span>Acuan: 3.20 km/L</span>
+            <div className="flex justify-between text-[10px] text-slate-400 mt-0.5">
+              <span>2.10 (Macet Padat)</span>
+              <span>Acuan Standar: 3.20 km/L</span>
               <span>3.40 (Lancar Subuh)</span>
             </div>
           </div>
 
           {/* Koordinat Awal [Lat, Long] */}
-          <div className="bg-slate-800/60 p-3 rounded-xl border border-slate-700/60 space-y-2">
+          <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-emerald-400 flex items-center gap-1">
-                <MapPin className="w-3.5 h-3.5" /> Titik Awal (Depo)
+              <span className="text-xs font-medium text-slate-800 flex items-center gap-1">
+                <MapPin className="w-3.5 h-3.5 text-emerald-600" /> Titik Awal (Depo)
               </span>
               <div className="flex gap-1 text-[10px]">
                 <button
                   type="button"
                   onClick={() => applyPresetAwal(0)}
-                  className="px-1.5 py-0.5 bg-slate-700 hover:bg-slate-600 rounded text-slate-300"
+                  className="px-2 py-0.5 bg-white border border-slate-200 hover:bg-slate-100 rounded text-slate-700"
                 >
                   Depo Serang
                 </button>
                 <button
                   type="button"
                   onClick={() => applyPresetAwal(1)}
-                  className="px-1.5 py-0.5 bg-slate-700 hover:bg-slate-600 rounded text-slate-300"
+                  className="px-2 py-0.5 bg-white border border-slate-200 hover:bg-slate-100 rounded text-slate-700"
                 >
                   Cilegon
                 </button>
@@ -345,24 +341,24 @@ export const AddRouteModal: React.FC<AddRouteModalProps> = ({
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <span className="text-[10px] text-slate-400">Latitude</span>
+                <span className="text-[10px] text-slate-500">Latitude</span>
                 <input
                   type="number"
                   step="0.000001"
                   value={latAwal}
                   onChange={(e) => setLatAwal(Number(e.target.value))}
-                  className="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1 text-xs text-white"
+                  className="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-900"
                   required
                 />
               </div>
               <div>
-                <span className="text-[10px] text-slate-400">Longitude</span>
+                <span className="text-[10px] text-slate-500">Longitude</span>
                 <input
                   type="number"
                   step="0.000001"
                   value={lngAwal}
                   onChange={(e) => setLngAwal(Number(e.target.value))}
-                  className="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1 text-xs text-white"
+                  className="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-900"
                   required
                 />
               </div>
@@ -370,30 +366,30 @@ export const AddRouteModal: React.FC<AddRouteModalProps> = ({
           </div>
 
           {/* Koordinat Akhir [Lat, Long] */}
-          <div className="bg-slate-800/60 p-3 rounded-xl border border-slate-700/60 space-y-2">
+          <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-rose-400 flex items-center gap-1">
-                <MapPin className="w-3.5 h-3.5" /> Titik Akhir (Tujuan / SPBU)
+              <span className="text-xs font-medium text-slate-800 flex items-center gap-1">
+                <MapPin className="w-3.5 h-3.5 text-rose-600" /> Titik Akhir (Tujuan)
               </span>
               <div className="flex gap-1 text-[10px]">
                 <button
                   type="button"
                   onClick={() => applyPresetAkhir(1)}
-                  className="px-1.5 py-0.5 bg-slate-700 hover:bg-slate-600 rounded text-slate-300"
+                  className="px-2 py-0.5 bg-white border border-slate-200 hover:bg-slate-100 rounded text-slate-700"
                 >
                   Cilegon
                 </button>
                 <button
                   type="button"
                   onClick={() => applyPresetAkhir(2)}
-                  className="px-1.5 py-0.5 bg-slate-700 hover:bg-slate-600 rounded text-slate-300"
+                  className="px-2 py-0.5 bg-white border border-slate-200 hover:bg-slate-100 rounded text-slate-700"
                 >
                   Anyer
                 </button>
                 <button
                   type="button"
                   onClick={() => applyPresetAkhir(3)}
-                  className="px-1.5 py-0.5 bg-slate-700 hover:bg-slate-600 rounded text-slate-300"
+                  className="px-2 py-0.5 bg-white border border-slate-200 hover:bg-slate-100 rounded text-slate-700"
                 >
                   Merak
                 </button>
@@ -401,24 +397,24 @@ export const AddRouteModal: React.FC<AddRouteModalProps> = ({
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <span className="text-[10px] text-slate-400">Latitude</span>
+                <span className="text-[10px] text-slate-500">Latitude</span>
                 <input
                   type="number"
                   step="0.000001"
                   value={latAkhir}
                   onChange={(e) => setLatAkhir(Number(e.target.value))}
-                  className="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1 text-xs text-white"
+                  className="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-900"
                   required
                 />
               </div>
               <div>
-                <span className="text-[10px] text-slate-400">Longitude</span>
+                <span className="text-[10px] text-slate-500">Longitude</span>
                 <input
                   type="number"
                   step="0.000001"
                   value={lngAkhir}
                   onChange={(e) => setLngAkhir(Number(e.target.value))}
-                  className="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1 text-xs text-white"
+                  className="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-900"
                   required
                 />
               </div>
@@ -426,19 +422,19 @@ export const AddRouteModal: React.FC<AddRouteModalProps> = ({
           </div>
 
           {/* Form Actions */}
-          <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-800">
+          <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-medium"
+              className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold transition-colors"
             >
               Batal
             </button>
             <button
               type="submit"
-              className="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-lg text-xs shadow-md"
+              className="px-5 py-2 bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-semibold rounded-xl text-xs transition-all shadow-sm active:scale-[0.98]"
             >
-              Simpan & Gambar ke Peta
+              Simpan & Tampilkan ke Peta
             </button>
           </div>
         </form>

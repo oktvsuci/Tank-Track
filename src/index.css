@@ -1,1 +1,69 @@
 @import "tailwindcss";
+
+/* ==========================================================================
+   Print Styles - Exclusively print the Digital Fuel Audit Receipt
+   ========================================================================== */
+@media print {
+  @page {
+    size: auto;
+    margin: 10mm;
+  }
+
+  html,
+  body {
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+    color: #0f172a !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    min-height: 0 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Hide all non-printable dashboard elements */
+  .print\:hidden,
+  header,
+  footer,
+  nav,
+  aside,
+  #tanktrack-header,
+  #tanktrack-control-panel,
+  #tanktrack-fleet-table-card,
+  .leaflet-container,
+  button {
+    display: none !important;
+  }
+
+  /* Center the thermal receipt cleanly in print */
+  #tanktrack-digital-receipt-wrapper {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    width: 100% !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+  }
+
+  #thermal-receipt {
+    display: block !important;
+    width: 380px !important;
+    max-width: 100% !important;
+    margin: 0 auto !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 12px !important;
+    box-shadow: none !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    background-color: #ffffff !important;
+  }
+
+  /* Reset layout constraints for print */
+  main {
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+}

@@ -1,7 +1,7 @@
 'use client';
 
-import React from 'react';
-import { Receipt, Fuel, AlertTriangle, CheckCircle2, Clock, Printer, Download, Sparkles } from 'lucide-react';
+import React, { useState } from 'react';
+import { Fuel, AlertCircle, CheckCircle2, Printer, Copy, Check, ShieldCheck } from 'lucide-react';
 import { AggregateSummary } from '../src/types';
 
 interface DigitalReceiptProps {
@@ -15,191 +15,197 @@ export const DigitalReceipt: React.FC<DigitalReceiptProps> = ({
   filterHari,
   filterKode,
 }) => {
+  const [copied, setCopied] = useState(false);
+
   if (!summary) {
     return (
-      <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 text-center text-slate-400">
-        Memuat data kuitansi BBM digital...
+      <div className="bg-white border border-slate-200 rounded-xl p-6 text-center text-slate-400 text-xs">
+        Memuat data audit BBM...
       </div>
     );
   }
 
+  const invoiceNo = `FLT-${summary.total_trip}${String(summary.total_biaya_rp).slice(-4)}`;
   const efisiensiSelisih = Math.round((summary.rata_rata_km_per_liter - summary.efisiensi_acuan_standar) * 100) / 100;
   const isOptimal = efisiensiSelisih >= 0;
+
+  const handleCopyNo = () => {
+    navigator.clipboard.writeText(invoiceNo);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   const handlePrint = () => {
     window.print();
   };
 
   return (
-    <div id="tanktrack-digital-receipt-wrapper" className="flex flex-col items-center">
-      {/* Thermal Receipt Container */}
+    <div id="tanktrack-digital-receipt-wrapper" className="flex flex-col items-center w-full">
+      {/* Receipt Card with Realistic Styling */}
       <div
         id="thermal-receipt"
-        className="relative w-full max-w-sm bg-amber-50 text-slate-900 font-mono rounded-lg shadow-2xl p-5 border border-amber-200/80 select-text transition-all"
-        style={{
-          boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.4), 0 8px 10px -6px rgba(0, 0, 0, 0.3)',
-        }}
+        className="w-full bg-white text-slate-800 rounded-2xl shadow-sm border border-slate-200/90 relative overflow-hidden select-text transition-all print:border print:border-slate-300 print:shadow-none print:rounded-xl print:w-[380px] print:max-w-full"
       >
-        {/* Jagged Top Paper Effect */}
-        <div className="absolute -top-2 left-0 right-0 h-2 bg-amber-50 [mask-image:radial-gradient(circle,transparent_4px,black_4px)] [mask-size:12px_12px] opacity-90"></div>
+        {/* Top colored receipt tab */}
+        <div className="h-1.5 w-full bg-gradient-to-r from-blue-600 via-emerald-500 to-indigo-600"></div>
 
-        {/* Receipt Header */}
-        <div className="text-center border-b-2 border-dashed border-slate-400 pb-3 mb-3">
-          <div className="flex items-center justify-center gap-1.5 mb-1 text-slate-800">
-            <Fuel className="w-5 h-5 text-amber-700" />
-            <h3 className="font-extrabold text-base tracking-wider uppercase">PERTAMINA PATRA FLEET</h3>
-          </div>
-          <p className="text-[11px] text-slate-600 uppercase font-sans">
-            Sistem Monitoring & Audit Efisiensi BBM
-          </p>
-          <p className="text-[10px] text-slate-500 font-sans mt-0.5">
-            Depo Koridor Industri Banten (Serang - Cilegon)
-          </p>
-          <div className="text-[10px] text-slate-500 mt-1 border-t border-slate-300 pt-1">
-            <span>NO. STRUK: <strong>TTK-{Date.now().toString().slice(-6)}</strong></span>
-            <span className="mx-1">•</span>
-            <span>TANGGAL: 03-09 MAR 2025</span>
-          </div>
-        </div>
+        <div className="p-5 space-y-4">
+          {/* Official Header */}
+          <div className="text-center border-b border-dashed border-slate-200 pb-3.5">
+            <div className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-blue-50 text-blue-700 mb-1.5 ring-1 ring-blue-500/20">
+              <Fuel className="w-4 h-4" />
+            </div>
+            <h3 className="font-extrabold text-sm tracking-wider text-slate-900">
+              PERTAMINA PATRA FLEET
+            </h3>
+            <p className="text-[11px] font-medium text-slate-500">
+              Sistem Audit & Verifikasi BBM Biosolar
+            </p>
 
-        {/* Unit & Filter Badge */}
-        <div className="bg-amber-100/70 rounded p-2 mb-3 text-[11px] border border-amber-200">
-          <div className="flex justify-between items-center py-0.5">
-            <span className="text-slate-600">KODE UNIT / ARMADA:</span>
-            <strong className="text-slate-900 font-bold bg-amber-200/80 px-1.5 py-0.5 rounded text-xs">
-              {filterKode === 'Semua' ? 'MULTI-ARMADA (3 UNIT)' : filterKode}
-            </strong>
-          </div>
-          <div className="flex justify-between items-center py-0.5">
-            <span className="text-slate-600">HARI OPERASIONAL:</span>
-            <strong className="text-slate-900 font-semibold">{filterHari.toUpperCase()}</strong>
-          </div>
-          <div className="flex justify-between items-center py-0.5">
-            <span className="text-slate-600">JENIS BAHAN BAKAR:</span>
-            <strong className="text-slate-900">BIOSOLAR (B35)</strong>
-          </div>
-          <div className="flex justify-between items-center py-0.5">
-            <span className="text-slate-600">TARIF PER LITER:</span>
-            <strong className="text-slate-900">Rp {summary.harga_per_liter.toLocaleString('id-ID')} / L</strong>
-          </div>
-        </div>
-
-        {/* Breakdown Items Table */}
-        <div className="space-y-1.5 text-xs border-b-2 border-dashed border-slate-400 pb-3 mb-3">
-          <div className="flex justify-between text-[11px] text-slate-500 font-sans border-b border-slate-300 pb-1">
-            <span>PARAMETER FLEET</span>
-            <span>NILAI DINAMIS</span>
-          </div>
-
-          <div className="flex justify-between pt-1">
-            <span className="text-slate-700">TOTAL TRIP / PERJALANAN:</span>
-            <strong className="font-bold">{summary.total_trip} Trip</strong>
-          </div>
-
-          <div className="flex justify-between">
-            <span className="text-slate-700">TOTAL JARAK TEMPUH:</span>
-            <strong className="font-bold">{summary.total_jarak_km.toLocaleString('id-ID')} km</strong>
-          </div>
-
-          <div className="flex justify-between">
-            <span className="text-slate-700">KONSUMSI BBM TOTAL:</span>
-            <strong className="font-bold text-amber-900">{summary.total_liter.toLocaleString('id-ID')} Liter</strong>
-          </div>
-
-          <div className="flex justify-between">
-            <span className="text-slate-700">RATA-RATA EFISIENSI:</span>
-            <strong className={`font-bold ${isOptimal ? 'text-emerald-700' : 'text-rose-700'}`}>
-              {summary.rata_rata_km_per_liter} km/Liter
-            </strong>
-          </div>
-
-          <div className="flex justify-between text-[11px] text-slate-500 pl-2">
-            <span>• Standar Acuan Logis:</span>
-            <span>{summary.efisiensi_acuan_standar.toFixed(2)} km/L</span>
-          </div>
-
-          <div className="flex justify-between text-[11px] text-slate-500 pl-2">
-            <span>• Trip Malam (Lancar):</span>
-            <span>{summary.malam.rata_rata_km_per_liter} km/L ({summary.malam.jumlah_trip}x)</span>
-          </div>
-
-          <div className="flex justify-between text-[11px] text-slate-500 pl-2">
-            <span>• Trip Siang/Macet:</span>
-            <span>{summary.siang.rata_rata_km_per_liter} km/L ({summary.siang.jumlah_trip}x)</span>
-          </div>
-
-          {/* Kerugian Boros BBM Section */}
-          <div className="mt-2 pt-2 border-t border-dashed border-slate-300 bg-rose-50 -mx-2 px-2 py-1.5 rounded">
-            <div className="flex justify-between text-rose-900 font-bold">
-              <span className="flex items-center gap-1">
-                <AlertTriangle className="w-3.5 h-3.5 text-rose-600 inline" />
-                ESTIMASI BBM BOROS:
+            <div className="flex items-center justify-center gap-2 mt-2">
+              <span className="text-[10px] font-mono bg-slate-100 px-2 py-0.5 rounded text-slate-700 font-semibold border border-slate-200">
+                NO: {invoiceNo}
               </span>
-              <span>+{summary.total_liter_boros.toLocaleString('id-ID')} L</span>
-            </div>
-            <div className="flex justify-between text-[11px] text-rose-700 mt-0.5">
-              <span>BIAYA BOROS (KERUGIAN):</span>
-              <strong>Rp {summary.total_biaya_boros_rp.toLocaleString('id-ID')}</strong>
+              <button
+                type="button"
+                onClick={handleCopyNo}
+                className="text-slate-400 hover:text-blue-600 p-0.5 transition-colors print:hidden"
+                title="Salin Nomor Struk"
+              >
+                {copied ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
+              </button>
             </div>
           </div>
-        </div>
 
-        {/* Total Price Grand Total */}
-        <div className="text-center py-2 mb-3 bg-slate-900 text-amber-300 rounded p-2.5">
-          <span className="text-[10px] text-slate-400 tracking-wider block font-sans">
-            TOTAL BIAYA BBM (INVOICE FLEET)
-          </span>
-          <div className="text-xl font-extrabold text-amber-400 mt-0.5 tracking-tight">
-            Rp {summary.total_biaya_rp.toLocaleString('id-ID')}
+          {/* Unit & Context Specs */}
+          <div className="bg-slate-50/80 rounded-xl p-3 text-xs border border-slate-200/80 space-y-1.5">
+            <div className="flex justify-between items-center">
+              <span className="text-slate-500 text-[11px]">Unit Armada:</span>
+              <strong className="text-slate-900 font-semibold">
+                {filterKode === 'Semua' ? 'Multi-Armada (K-04, K-07, K-12)' : filterKode}
+              </strong>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-slate-500 text-[11px]">Periode Hari:</span>
+              <strong className="text-slate-900 font-semibold">{filterHari}</strong>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-slate-500 text-[11px]">Bahan Bakar:</span>
+              <span className="text-slate-800 font-mono text-[11px]">
+                Biosolar B35 (Rp {summary.harga_per_liter.toLocaleString('id-ID')}/L)
+              </span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-slate-500 text-[11px]">Koridor:</span>
+              <span className="text-slate-700 text-[11px] font-medium">Banten Arteri & Kawasan Industri</span>
+            </div>
           </div>
-        </div>
 
-        {/* Status Evaluasi */}
-        <div className="mb-4 text-center">
-          <div
-            className={`inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-full ${
-              summary.total_liter_boros < 1.0
-                ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
-                : 'bg-amber-100 text-amber-800 border border-amber-300'
-            }`}
-          >
-            {summary.total_liter_boros < 1.0 ? (
-              <>
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                <span>Efisiensi Optimal (Mendekati Standar)</span>
-              </>
-            ) : (
-              <>
-                <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
-                <span>Terdeteksi Kemacetan / Engine Idling</span>
-              </>
+          {/* Metric Table */}
+          <div className="space-y-2 text-xs border-b border-dashed border-slate-200 pb-3">
+            <div className="flex justify-between items-center">
+              <span className="text-slate-600">Total Perjalanan Terdata:</span>
+              <strong className="font-mono text-slate-900 font-semibold">{summary.total_trip} Trip</strong>
+            </div>
+
+            <div className="flex justify-between items-center">
+              <span className="text-slate-600">Total Jarak Tempuh GPS:</span>
+              <strong className="font-mono text-slate-900 font-semibold">{summary.total_jarak_km.toLocaleString('id-ID')} km</strong>
+            </div>
+
+            <div className="flex justify-between items-center">
+              <span className="text-slate-600">Total Konsumsi Biosolar:</span>
+              <strong className="font-mono text-slate-900 font-semibold">{summary.total_liter.toLocaleString('id-ID')} Liter</strong>
+            </div>
+
+            <div className="flex justify-between items-center pt-1 border-t border-slate-100">
+              <span className="text-slate-700 font-medium">Efisiensi Rata-rata:</span>
+              <strong className={`font-mono text-sm font-bold ${isOptimal ? 'text-emerald-700' : 'text-blue-700'}`}>
+                {summary.rata_rata_km_per_liter} <span className="text-xs font-sans font-normal">km/L</span>
+              </strong>
+            </div>
+
+            <div className="grid grid-cols-2 gap-1.5 pt-1 text-[11px] text-slate-500">
+              <div className="bg-slate-100/70 p-1.5 rounded border border-slate-200/50">
+                <span className="block text-[10px] text-slate-400">Standar Acuan:</span>
+                <span className="font-mono font-semibold text-slate-700">{summary.efisiensi_acuan_standar.toFixed(2)} km/L</span>
+              </div>
+              <div className="bg-slate-100/70 p-1.5 rounded border border-slate-200/50">
+                <span className="block text-[10px] text-slate-400">Selisih Deviasi:</span>
+                <span className={`font-mono font-semibold ${efisiensiSelisih >= 0 ? 'text-emerald-700' : 'text-rose-700'}`}>
+                  {efisiensiSelisih >= 0 ? `+${efisiensiSelisih}` : efisiensiSelisih} km/L
+                </span>
+              </div>
+            </div>
+
+            {/* Waste Breakdown */}
+            {summary.total_liter_boros > 0 && (
+              <div className="mt-2 pt-2 border-t border-dashed border-rose-200 bg-rose-50/60 p-2.5 rounded-xl">
+                <div className="flex justify-between text-rose-800 text-xs font-semibold">
+                  <span className="flex items-center gap-1">
+                    <AlertCircle className="w-3.5 h-3.5 text-rose-600 shrink-0" />
+                    BBM Boros (Macet & Idling):
+                  </span>
+                  <span className="font-mono text-rose-900">+{summary.total_liter_boros.toLocaleString('id-ID')} L</span>
+                </div>
+                <div className="flex justify-between text-[11px] text-rose-700 mt-1">
+                  <span>Biaya Pemborosan:</span>
+                  <span className="font-mono font-bold">Rp {summary.total_biaya_boros_rp.toLocaleString('id-ID')}</span>
+                </div>
+              </div>
             )}
           </div>
-        </div>
 
-        {/* Barcode representation */}
-        <div className="text-center border-t border-slate-300 pt-3">
-          <div className="h-9 w-4/5 mx-auto bg-slate-900/90 flex items-center justify-center tracking-widest text-[9px] text-slate-100 font-mono rounded-sm select-none">
-            ||||| | |||| ||| || |||||| | ||| |||| |
+          {/* Invoice Total */}
+          <div className="text-center py-2.5 bg-gradient-to-br from-slate-900 to-blue-950 text-white rounded-xl shadow-xs">
+            <span className="text-[10px] text-slate-300 uppercase tracking-widest font-semibold block">
+              TOTAL BIAYA BBM DITERBITKAN
+            </span>
+            <div className="text-xl font-bold font-mono mt-0.5 tracking-tight text-white">
+              Rp {summary.total_biaya_rp.toLocaleString('id-ID')}
+            </div>
+            <span className="text-[10px] text-blue-200 block mt-0.5">
+              Tercatat di Jurnal Logistik Banten
+            </span>
           </div>
-          <p className="text-[9px] text-slate-500 mt-1 font-mono tracking-widest">
-            *TANKTRACK-GIS-WEEK5-VALIDATED*
-          </p>
-        </div>
 
-        {/* Serrated Bottom Paper Effect */}
-        <div className="absolute -bottom-2 left-0 right-0 h-2 bg-amber-50 [mask-image:radial-gradient(circle,transparent_4px,black_4px)] [mask-size:12px_12px] opacity-90"></div>
+          {/* Stamp & Verification */}
+          <div className="flex items-center justify-between pt-1">
+            <div className="flex items-center gap-1.5 text-[11px] text-emerald-700 font-semibold bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+              <span>TERVALIDASI GPS</span>
+            </div>
+
+            <div className="text-[10px] text-slate-400 font-mono">
+              PARAF AUDITOR: LORRY-LOG
+            </div>
+          </div>
+
+          {/* Minimal Barcode Graphic */}
+          <div className="text-center border-t border-slate-100 pt-3">
+            <div className="h-7 w-4/5 mx-auto bg-slate-100 border border-slate-200 flex items-center justify-center tracking-widest text-[9px] text-slate-600 font-mono rounded select-none">
+              ||| | |||| || |||||| | ||| || |||
+            </div>
+            <p className="text-[9px] text-slate-400 mt-1 font-mono tracking-wider">
+              *{invoiceNo}-BANTEN-PATRA*
+            </p>
+          </div>
+
+          <div className="hidden print:block text-[9px] text-slate-400 text-center pt-2 border-t border-slate-100 font-mono">
+            Dokumen Hasil Cetak Resmi Fleet Monitoring TankTrack GIS
+          </div>
+        </div>
       </div>
 
-      {/* Action Button: Print Receipt */}
-      <div className="mt-3 flex items-center gap-2">
+      {/* Action Button: Print */}
+      <div className="mt-3 flex items-center gap-2 print:hidden">
         <button
           type="button"
           onClick={handlePrint}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white rounded-lg text-xs font-medium transition-colors shadow-sm"
+          className="inline-flex items-center gap-1.5 px-4 py-2 bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 hover:text-slate-900 rounded-xl text-xs font-semibold transition-all shadow-xs hover:shadow"
         >
-          <Printer className="w-3.5 h-3.5 text-slate-400" />
-          <span>Cetak / Ekspor Struk</span>
+          <Printer className="w-3.5 h-3.5 text-blue-600" />
+          <span>Cetak / Simpan Struk BBM</span>
         </button>
       </div>
     </div>
