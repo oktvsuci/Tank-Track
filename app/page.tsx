@@ -249,7 +249,7 @@ export default function TankTrackDashboard() {
       {/* Footer */}
       <footer className="border-t border-slate-800/80 bg-slate-900/60 py-4 px-6 text-center text-xs text-slate-500">
         <p>
-          TankTrack GIS v1.0 • Laboratorium Sistem Informasi Geografis (Week 5 Task) • Next.js + React + Leaflet.js
+          TankTrack WebGIS • Enterprise Fleet Analytics & Telematics • MBC Lab
         </p>
       </footer>
 

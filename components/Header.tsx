@@ -28,9 +28,6 @@ export const Header: React.FC<HeaderProps> = ({
             <div className="flex items-center gap-2 flex-wrap">
               <h1 className="text-lg sm:text-xl font-bold tracking-tight text-white flex items-center gap-1.5">
                 TankTrack GIS
-                <span className="text-xs px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-400 border border-amber-500/30 font-semibold tracking-normal">
-                  v1.0 Week 5 Lab
-                </span>
               </h1>
             </div>
             <p className="text-xs text-slate-400 flex items-center gap-2 flex-wrap">
