@@ -63,6 +63,14 @@ export async function GET(request: Request) {
       ? Math.round((siangTrips.reduce((acc: number, f: any) => acc + (f.properties?.km_per_liter || 0), 0) / siangTrips.length) * 100) / 100
       : 0;
 
+    const malamBoros = Math.round(
+      malamTrips.reduce((acc: number, f: any) => acc + (f.properties?.liter_boros || 0), 0) * 100
+    ) / 100;
+
+    const siangBoros = Math.round(
+      siangTrips.reduce((acc: number, f: any) => acc + (f.properties?.liter_boros || 0), 0) * 100
+    ) / 100;
+
     const rataKmLiter = totalLiter > 0
       ? Math.round((totalJarak / totalLiter) * 100) / 100
       : 0;
@@ -86,10 +94,12 @@ export async function GET(request: Request) {
         malam: {
           jumlah_trip: malamTrips.length,
           rata_rata_km_per_liter: malamKmLiter,
+          total_liter_boros: malamBoros,
         },
         siang: {
           jumlah_trip: siangTrips.length,
           rata_rata_km_per_liter: siangKmLiter,
+          total_liter_boros: siangBoros,
         }
       }
     });

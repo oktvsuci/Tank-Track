@@ -76,9 +76,16 @@ export default function TankTrackDashboard() {
       const updatedTotalJarak = Math.round((summary.total_jarak_km + newRoute.properties.jarak_km) * 100) / 100;
       const updatedTotalLiter = Math.round((summary.total_liter + newRoute.properties.liter_total) * 100) / 100;
       const updatedTotalBiaya = summary.total_biaya_rp + newRoute.properties.biaya_rp;
+      const updatedTotalIdle = Math.round((summary.total_liter_idle + newRoute.properties.liter_idle) * 100) / 100;
       const updatedTotalBorosLiter = Math.round((summary.total_liter_boros + newRoute.properties.liter_boros) * 100) / 100;
       const updatedTotalBorosBiaya = summary.total_biaya_boros_rp + newRoute.properties.biaya_boros_rp;
-      const updatedRataKmLiter = Math.round((updatedTotalJarak / updatedTotalLiter) * 100) / 100;
+      const updatedRataKmLiter = updatedTotalLiter > 0 ? Math.round((updatedTotalJarak / updatedTotalLiter) * 100) / 100 : 0;
+      const updatedMalam = newRoute.properties.malam
+        ? { ...summary.malam, jumlah_trip: summary.malam.jumlah_trip + 1 }
+        : summary.malam;
+      const updatedSiang = newRoute.properties.malam
+        ? summary.siang
+        : { ...summary.siang, jumlah_trip: summary.siang.jumlah_trip + 1 };
 
       setSummary({
         ...summary,
@@ -86,9 +93,12 @@ export default function TankTrackDashboard() {
         total_jarak_km: updatedTotalJarak,
         total_liter: updatedTotalLiter,
         total_biaya_rp: updatedTotalBiaya,
+        total_liter_idle: updatedTotalIdle,
         total_liter_boros: updatedTotalBorosLiter,
         total_biaya_boros_rp: updatedTotalBorosBiaya,
         rata_rata_km_per_liter: updatedRataKmLiter,
+        malam: updatedMalam,
+        siang: updatedSiang,
       });
     }
 

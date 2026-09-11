@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { X, Plus, MapPin, Truck, Calendar, Clock, Gauge } from 'lucide-react';
 import { RouteFeature, PointFeature } from '../src/types';
+import { HARGA_BBM_PER_LITER, EFISIENSI_ACUAN_STANDAR, BATAS_EFISIEN_BOROS, ZONA_WAKTU_MALAM } from '../src/config';
 
 interface AddRouteModalProps {
   isOpen: boolean;
@@ -42,13 +43,13 @@ export const AddRouteModal: React.FC<AddRouteModalProps> = ({
 
     const tripId = Date.now();
     const literJalan = Math.round((jarakKm / kmPerLiter) * 100) / 100;
-    const literIdle = kmPerLiter < 2.7 ? 0.35 : 0.05;
+    const literIdle = kmPerLiter < BATAS_EFISIEN_BOROS ? 0.35 : 0.05;
     const literTotal = Math.round((literJalan + literIdle) * 100) / 100;
-    const biayaRp = Math.round(literTotal * 6800);
+    const biayaRp = Math.round(literTotal * HARGA_BBM_PER_LITER);
 
-    const literIdeal = Math.round((jarakKm / 3.20) * 100) / 100;
+    const literIdeal = Math.round((jarakKm / EFISIENSI_ACUAN_STANDAR) * 100) / 100;
     const literBoros = Math.max(0, Math.round((literTotal - literIdeal) * 100) / 100);
-    const biayaBorosRp = Math.round(literBoros * 6800);
+    const biayaBorosRp = Math.round(literBoros * HARGA_BBM_PER_LITER);
 
     // Calculate end time
     const [h, m] = jamMulai.split(':').map(Number);
@@ -73,8 +74,8 @@ export const AddRouteModal: React.FC<AddRouteModalProps> = ({
       type: 'Feature',
       properties: {
         trip_id: tripId,
-        nama: `Trip Tambahan (${kodeKendaraan})`,
-        kendaraan: kodeKendaraan === 'K-04' ? 'Truk tangki 30KL' : kodeKendaraan === 'K-07' ? 'Truk tangki 16KL' : 'Truk tangki 24KL',
+        nama: `Simulasi Trip Tambahan (${kodeKendaraan})`,
+        kendaraan: kodeKendaraan === 'K-04' ? 'Truk tangki 30KL' : kodeKendaraan === 'K-07' ? 'Truk tangki 16KL' : kodeKendaraan === 'K-12' ? 'Truk tangki 24KL' : 'Truk tangki cadangan',
         kode_kendaraan: kodeKendaraan,
         trayek,
         arah: `Depo Awal ke Titik Tujuan`,
@@ -91,16 +92,16 @@ export const AddRouteModal: React.FC<AddRouteModalProps> = ({
         liter_total: literTotal,
         liter_jalan: literJalan,
         liter_idle: literIdle,
-        menit_idle: kmPerLiter < 2.7 ? 2.5 : 0.5,
+        menit_idle: kmPerLiter < BATAS_EFISIEN_BOROS ? 2.5 : 0.5,
         liter_per_100km: Math.round((literTotal / jarakKm) * 100 * 100) / 100,
         km_per_liter: kmPerLiter,
         biaya_rp: biayaRp,
         liter_boros: literBoros,
         biaya_boros_rp: biayaBorosRp,
         jenis_bbm: 'Biosolar',
-        harga_per_liter: 6800,
-        malam: h >= 21 || h <= 5,
-        status_efisiensi: kmPerLiter >= 2.90 ? 'Efisien' : kmPerLiter >= 2.70 ? 'Normal' : 'Boros',
+        harga_per_liter: HARGA_BBM_PER_LITER,
+        malam: h >= ZONA_WAKTU_MALAM.mulai || h <= ZONA_WAKTU_MALAM.selesai,
+        status_efisiensi: kmPerLiter >= 2.90 ? 'Efisien' : kmPerLiter >= BATAS_EFISIEN_BOROS ? 'Normal' : 'Boros',
       },
       geometry: {
         type: 'LineString',
@@ -296,8 +297,8 @@ export const AddRouteModal: React.FC<AddRouteModalProps> = ({
                 <Gauge className="w-3.5 h-3.5 text-slate-400" />
                 Estimasi Efisiensi BBM (km / Liter)
               </span>
-              <span className={`font-mono text-xs font-semibold ${kmPerLiter >= 2.7 ? 'text-emerald-700' : 'text-rose-700'}`}>
-                {kmPerLiter} km/L ({kmPerLiter < 2.7 ? 'Macet / Idling' : 'Efisien'})
+              <span className={`font-mono text-xs font-semibold ${kmPerLiter >= BATAS_EFISIEN_BOROS ? 'text-emerald-700' : 'text-rose-700'}`}>
+                {kmPerLiter} km/L ({kmPerLiter < BATAS_EFISIEN_BOROS ? 'Macet / Idling' : 'Efisien'})
               </span>
             </label>
             <input

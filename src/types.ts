@@ -97,10 +97,12 @@ export interface AggregateSummary {
   malam: {
     jumlah_trip: number;
     rata_rata_km_per_liter: number;
+    total_liter_boros: number;
   };
   siang: {
     jumlah_trip: number;
     rata_rata_km_per_liter: number;
+    total_liter_boros: number;
   };
 }
 

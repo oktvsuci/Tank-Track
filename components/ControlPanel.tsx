@@ -17,6 +17,7 @@ import {
   TrendingDown,
 } from 'lucide-react';
 import { AggregateSummary } from '../src/types';
+import { EFISIENSI_ACUAN_STANDAR } from '../src/config';
 
 interface ControlPanelProps {
   filterHari: string;
@@ -193,7 +194,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
                   {summary.total_jarak_km.toLocaleString('id-ID')} <span className="text-xs font-sans font-normal text-slate-500">km</span>
                 </div>
                 <div className="text-[10px] text-slate-500 mt-0.5">
-                  Rata-rata: <strong className="text-slate-700">{(summary.total_jarak_km / summary.total_trip).toFixed(1)} km/trip</strong>
+                  Rata-rata: <strong className="text-slate-700">{summary.total_trip > 0 ? (summary.total_jarak_km / summary.total_trip).toFixed(1) : '0.0'} km/trip</strong>
                 </div>
               </div>
             </div>
@@ -229,9 +230,9 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
                   {summary.rata_rata_km_per_liter} <span className="text-xs font-sans font-normal text-emerald-600">km/L</span>
                 </div>
                 <div className="text-[10px] text-slate-500 mt-0.5 flex items-center justify-between">
-                  <span>Standar: <strong>3.20</strong></span>
+                  <span>Standar: <strong>{EFISIENSI_ACUAN_STANDAR.toFixed(2)}</strong></span>
                   <span className="text-emerald-700 font-semibold font-mono">
-                    {Math.round((summary.rata_rata_km_per_liter / 3.20) * 100)}%
+                    {Math.round((summary.rata_rata_km_per_liter / EFISIENSI_ACUAN_STANDAR) * 100)}%
                   </span>
                 </div>
               </div>
@@ -270,7 +271,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
                   Rp {summary.total_biaya_rp.toLocaleString('id-ID')}
                 </div>
                 <div className="text-[10px] text-slate-500 mt-0.5">
-                  Rp {Math.round(summary.total_biaya_rp / summary.total_jarak_km).toLocaleString('id-ID')}/km
+                  Rp {summary.total_jarak_km > 0 ? Math.round(summary.total_biaya_rp / summary.total_jarak_km).toLocaleString('id-ID') : '0'}/km
                 </div>
               </div>
             </div>

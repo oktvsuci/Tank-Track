@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import { RouteFeature, PointFeature } from '../src/types';
+import { BATAS_EFISIEN_BOROS } from '../src/config';
 import { Layers, Compass, Eye, EyeOff, Maximize2, MapPin, X, Info } from 'lucide-react';
 
 interface MapViewProps {
@@ -133,7 +134,7 @@ export const MapView: React.FC<MapViewProps> = ({
       latLngs.forEach((latLng) => bounds.extend(latLng));
 
       const prop = feature.properties;
-      const isBoros = (prop.status_efisiensi === 'Boros') || (prop.km_per_liter < 2.70) || (prop.liter_boros > 2.0);
+      const isBoros = (prop.status_efisiensi === 'Boros') || (prop.km_per_liter < BATAS_EFISIEN_BOROS) || (prop.liter_boros > 2.0);
       const isSelected = selectedTripId === prop.trip_id;
 
       // Color coding:
@@ -150,7 +151,7 @@ export const MapView: React.FC<MapViewProps> = ({
         color: routeColor,
         weight: isSelected ? 6 : isBoros ? 4 : 3.5,
         opacity: isSelected ? 1 : 0.85,
-        dashArray: feature.properties.nama.includes('Simulasi') ? '6, 6' : undefined,
+        dashArray: (feature.properties.nama.includes('Simulasi') || feature.properties.nama.includes('Tambahan')) ? '6, 6' : undefined,
       });
 
       // Hover tooltip
@@ -254,7 +255,7 @@ export const MapView: React.FC<MapViewProps> = ({
   return (
     <div id="tanktrack-map-container" className="relative w-full h-[520px] md:h-[620px] bg-slate-100 rounded-2xl overflow-hidden border border-slate-200/90 shadow-sm">
       {/* Actual Leaflet DOM container */}
-      <div ref={mapContainerRef} className="w-full h-full z-10" />
+      <div ref={mapContainerRef} className="w-full h-full relative z-0" />
 
       {/* Selected Trip Floating Banner */}
       {selectedRoute && (
@@ -265,7 +266,7 @@ export const MapView: React.FC<MapViewProps> = ({
             <span className="text-slate-500 mx-1.5">•</span>
             <span className="text-slate-700">{selectedRoute.properties.hari} ({selectedRoute.properties.jam_mulai})</span>
             <span className="text-slate-500 mx-1.5">•</span>
-            <span className={`font-semibold ${selectedRoute.properties.km_per_liter >= 2.7 ? 'text-emerald-700' : 'text-rose-700'}`}>
+            <span className={`font-semibold ${selectedRoute.properties.km_per_liter >= BATAS_EFISIEN_BOROS ? 'text-emerald-700' : 'text-rose-700'}`}>
               {selectedRoute.properties.km_per_liter} km/L
             </span>
           </div>
@@ -369,12 +370,12 @@ export const MapView: React.FC<MapViewProps> = ({
           <div className="space-y-2">
             <div className="flex items-center gap-2.5">
               <div className="w-5 h-1.5 bg-[#2563eb] rounded-full shadow-2xs"></div>
-              <span className="font-medium text-slate-800">Trip Normal / Efisien (&ge; 2.70 km/L)</span>
+              <span className="font-medium text-slate-800">Trip Normal / Efisien (&ge; {BATAS_EFISIEN_BOROS.toFixed(2)} km/L)</span>
             </div>
 
             <div className="flex items-center gap-2.5">
               <div className="w-5 h-1.5 bg-[#e11d48] rounded-full shadow-2xs"></div>
-              <span className="font-medium text-slate-800">Trip Boros / Macet (&lt; 2.70 km/L)</span>
+              <span className="font-medium text-slate-800">Trip Boros / Macet (&lt; {BATAS_EFISIEN_BOROS.toFixed(2)} km/L)</span>
             </div>
 
             <div className="flex items-center gap-2.5 pt-1 border-t border-slate-100">

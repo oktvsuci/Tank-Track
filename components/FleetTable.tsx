@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { RouteFeature } from '../src/types';
+import { BATAS_EFISIEN_BOROS } from '../src/config';
 import { Truck, Clock, Search, ArrowUpDown, Sun, Moon, AlertCircle, CheckCircle2, ChevronRight } from 'lucide-react';
 
 interface FleetTableProps {
@@ -32,7 +33,7 @@ export const FleetTable: React.FC<FleetTableProps> = ({
 
     if (!matchesSearch) return false;
 
-    const isBoros = prop.status_efisiensi === 'Boros' || prop.km_per_liter < 2.70;
+    const isBoros = prop.status_efisiensi === 'Boros' || prop.km_per_liter < BATAS_EFISIEN_BOROS;
     if (efficiencyFilter === 'efficient') return !isBoros;
     if (efficiencyFilter === 'wasteful') return isBoros;
     return true;
@@ -170,7 +171,7 @@ export const FleetTable: React.FC<FleetTableProps> = ({
             {sorted.map((item) => {
               const p = item.properties;
               const isSelected = selectedTripId === p.trip_id;
-              const isBoros = p.status_efisiensi === 'Boros' || p.km_per_liter < 2.70;
+              const isBoros = p.status_efisiensi === 'Boros' || p.km_per_liter < BATAS_EFISIEN_BOROS;
               const isNight = p.malam;
 
               return (
